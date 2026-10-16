@@ -40,9 +40,21 @@
     .direction { margin-top: 6px; color: #ffd083; font-size: 16px; font-weight: 700; }
     .details { display: flex; justify-content: space-between; gap: 12px; padding-top: 15px; border-top: 1px solid #ffffff18; color: #bdc9d0; font-size: 13px; }
     .details strong { display: block; margin-top: 5px; color: #f6f3ed; font-size: 14px; font-weight: 600; }
+    .location-display { margin: 15px 0 0; color: #d6e1e6; font-size: 13px; text-align: center; }
+    .location-options { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 17px; padding: 4px; border: 1px solid #ffffff18; border-radius: 15px; background: #0002; }
     button { width: 100%; min-height: 54px; margin-top: 18px; border: 0; border-radius: 16px; background: #f5bd72; color: #172333; font: inherit; font-size: 16px; font-weight: 750; cursor: pointer; }
     button:active { transform: scale(.99); }
     button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+    .mode-button { min-height: 44px; margin: 0; border-radius: 11px; background: transparent; color: #bdc9d0; font-size: 13px; }
+    .mode-button.active { background: #ffffff1b; color: #fff; }
+    .postcode-panel { margin-top: 15px; }
+    .postcode-panel label { display: block; margin-bottom: 7px; color: #d6e1e6; font-size: 13px; font-weight: 650; }
+    .postcode-controls { display: grid; grid-template-columns: 1fr auto; gap: 9px; }
+    .postcode-controls input { min-width: 0; min-height: 52px; padding: 0 14px; border: 1px solid #ffffff38; border-radius: 14px; background: #0d1826; color: #fff; font: inherit; font-size: 16px; text-transform: uppercase; }
+    .postcode-controls input::placeholder { color: #8395a1; text-transform: none; }
+    .postcode-controls input:focus-visible { outline: 3px solid #f5bd72; outline-offset: 2px; }
+    .postcode-controls button { width: auto; min-width: 92px; min-height: 52px; margin: 0; padding: 0 16px; font-size: 14px; }
+    .privacy-note { margin: 9px 3px 0; color: #91a2ad; font-size: 11px; line-height: 1.45; }
     .status { min-height: 20px; margin: 13px 2px 0; color: #bdc9d0; font-size: 13px; line-height: 1.45; text-align: center; }
     .footnote { margin: 20px 10px 0; color: #91a2ad; font-size: 12px; line-height: 1.5; text-align: center; }
   </style>
@@ -63,7 +75,22 @@
         <div>LOCAL TIME<strong id="local-time">—</strong></div>
         <div style="text-align:right">SUN ALTITUDE<strong id="altitude">—</strong></div>
       </div>
-      <button id="locate">Use my location</button>
+      <p class="location-display" id="location-display">Location not set</p>
+      <div class="location-options" role="group" aria-label="Choose how to set your location">
+        <button class="mode-button active" id="device-mode" type="button" aria-pressed="true">Use my location</button>
+        <button class="mode-button" id="postcode-mode" type="button" aria-pressed="false">Use UK postcode</button>
+      </div>
+      <div id="device-panel">
+        <button id="locate" type="button">Use my location</button>
+      </div>
+      <form class="postcode-panel" id="postcode-panel" hidden>
+        <label for="postcode-input">Enter a UK postcode</label>
+        <div class="postcode-controls">
+          <input id="postcode-input" name="postcode" type="text" inputmode="text" autocomplete="postal-code" autocapitalize="characters" placeholder="e.g. SW1A 1AA" required>
+          <button id="postcode-submit" type="submit">Look up</button>
+        </div>
+        <p class="privacy-note">The postcode you enter is sent to Postcodes.io to look up its coordinates. This app does not save it.</p>
+      </form>
       <p class="status" id="status" role="status">Tap to estimate the Sun’s position. Your location stays on this device.</p>
     </section>
     <p class="footnote">An approximate solar calculation for everyday use. The compass shows direction from north; altitude is how high the Sun is above the horizon.</p>
@@ -93,21 +120,55 @@
     const direction = document.getElementById("direction");
     const altitude = document.getElementById("altitude");
     const localTime = document.getElementById("local-time");
+    const locationDisplay = document.getElementById("location-display");
     const status = document.getElementById("status");
     const button = document.getElementById("locate");
+    const deviceMode = document.getElementById("device-mode");
+    const postcodeMode = document.getElementById("postcode-mode");
+    const devicePanel = document.getElementById("device-panel");
+    const postcodePanel = document.getElementById("postcode-panel");
+    const postcodeInput = document.getElementById("postcode-input");
+    const postcodeSubmit = document.getElementById("postcode-submit");
     let position = null;
+    let locationSource = "device";
+    let locationName = "";
+
+    function chooseLocationMode(mode) {
+      const useDevice = mode === "device";
+      deviceMode.classList.toggle("active", useDevice);
+      deviceMode.setAttribute("aria-pressed", String(useDevice));
+      postcodeMode.classList.toggle("active", !useDevice);
+      postcodeMode.setAttribute("aria-pressed", String(!useDevice));
+      devicePanel.hidden = !useDevice;
+      postcodePanel.hidden = useDevice;
+      position = null;
+      locationName = "";
+      updateDisplay();
+      status.textContent = useDevice ? "Tap to estimate the Sun’s position from this device." : "Enter a UK postcode to estimate the Sun’s position.";
+    }
+
+    deviceMode.addEventListener("click", () => chooseLocationMode("device"));
+    postcodeMode.addEventListener("click", () => chooseLocationMode("postcode"));
 
     function updateDisplay() {
       const now = new Date();
       localTime.textContent = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(now);
-      if (!position) return;
+      if (!position) {
+        degrees.textContent = "—°";
+        direction.textContent = "Waiting for location";
+        altitude.textContent = "—";
+        locationDisplay.textContent = "Location not set";
+        document.getElementById("needle").style.setProperty("--bearing", "180deg");
+        return;
+      }
       const sun = solarPosition(now, position.coords.latitude, position.coords.longitude);
       const rounded = Math.round(sun.azimuth);
       degrees.textContent = `${rounded}°`;
       direction.textContent = directions[Math.round(sun.azimuth / 22.5) % 16];
       altitude.textContent = `${Math.round(sun.altitude)}°`;
       document.getElementById("needle").style.setProperty("--bearing", `${sun.azimuth}deg`);
-      status.textContent = sun.altitude <= 0 ? "The Sun is below the horizon at your location." : "Approximate direction · refreshed every minute";
+      locationDisplay.textContent = locationSource === "postcode" ? `Postcode reference: ${locationName}` : "Using this device’s location";
+      status.textContent = sun.altitude <= 0 ? "The Sun is below the horizon at this location." : locationSource === "postcode" ? "Approximate direction · based on postcode coordinates" : "Approximate direction · refreshed every minute";
     }
 
     button.addEventListener("click", () => {
@@ -120,6 +181,8 @@
       status.textContent = "Your browser will ask whether to share your location.";
       navigator.geolocation.getCurrentPosition((result) => {
         position = result;
+        locationSource = "device";
+        locationName = "";
         button.disabled = false;
         button.textContent = "Refresh my location";
         updateDisplay();
@@ -128,6 +191,35 @@
         button.textContent = "Try location again";
         status.textContent = error.code === 1 ? "Location permission was declined. Allow it in Safari’s website settings to continue." : "Could not get your location. Check that Location Services are on, then try again.";
       }, { enableHighAccuracy: false, maximumAge: 300000, timeout: 15000 });
+    });
+
+    postcodePanel.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const postcode = postcodeInput.value.trim().replace(/\s+/g, " ").toUpperCase();
+      if (!postcode) {
+        postcodeInput.focus();
+        return;
+      }
+      postcodeSubmit.disabled = true;
+      postcodeSubmit.textContent = "Looking up…";
+      status.textContent = "Looking up the postcode coordinates…";
+      try {
+        const response = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`);
+        const data = await response.json();
+        if (!response.ok || data.status !== 200 || !data.result) {
+          status.textContent = "I couldn’t find that postcode. Check it and try again.";
+          return;
+        }
+        position = { coords: { latitude: data.result.latitude, longitude: data.result.longitude } };
+        locationSource = "postcode";
+        locationName = data.result.postcode;
+        updateDisplay();
+      } catch (error) {
+        status.textContent = "Could not reach Postcodes.io. Check your internet connection and try again.";
+      } finally {
+        postcodeSubmit.disabled = false;
+        postcodeSubmit.textContent = "Look up";
+      }
     });
 
     updateDisplay();

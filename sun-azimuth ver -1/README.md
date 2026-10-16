@@ -7,6 +7,8 @@ A small installable web app that estimates the Sun's compass bearing and altitud
 - **Use my location** asks Safari for the iPhone's location. The coordinates are used in the browser for the calculation.
 - **Use UK postcode** sends the postcode you enter to [Postcodes.io](https://postcodes.io/) to look up its coordinates. The app does not save the postcode. A postcode result is an approximate reference point for that area.
 
+Tap **Enable phone compass** and allow Motion & Orientation Access if Safari asks. Keep the iPhone flat: the compass rose then turns with the phone, moving north around the dial while the pointer indicates the Sun on screen. The phone's magnetic compass can drift a few degrees.
+
 ## What is in this folder?
 
 - `index.html` contains the screen, styling, location options, and solar-position calculation. This is the main file to edit.
@@ -25,7 +27,7 @@ The phone needs to open the app from an HTTPS website before Safari can use its 
 4. Open the repository's **Settings → Pages**. Under the build and deployment section, choose **Deploy from a branch**, select the `main` branch and `/ (root)` folder, then save.
 5. Wait for GitHub Pages to publish. The site address appears on that Pages settings screen and will look like `https://YOUR-USERNAME.github.io/sun-azimuth/`.
 6. On the iPhone, open that address in **Safari**. Tap **Share → Add to Home Screen**. Turn on **Open as Web App** if shown, then tap **Add**.
-7. Open the new Home Screen icon and choose **Use my location** or **Use UK postcode**.
+7. Open the new Home Screen icon and choose **Use my location** or **Use UK postcode**. For the compass to turn with the phone, tap **Enable phone compass** and allow motion access if asked.
 
 GitHub notes that first publication can take several minutes. Keep the trailing `/sun-azimuth/` in the website address.
 

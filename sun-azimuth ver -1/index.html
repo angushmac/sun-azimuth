@@ -27,6 +27,7 @@
     .compass::before, .compass::after { content: ""; position: absolute; background: #d8e8ef25; }
     .compass::before { width: 1px; height: 84%; top: 8%; left: calc(50% - .5px); }
     .compass::after { height: 1px; width: 84%; left: 8%; top: calc(50% - .5px); }
+    .compass-rose { position: absolute; inset: 0; transition: transform .12s linear; }
     .label { position: absolute; z-index: 2; color: #b8c8d1; font-size: 11px; font-weight: 700; }
     .north { top: 11px; left: 50%; transform: translateX(-50%); color: #f4bd70; }
     .east { right: 13px; top: 50%; transform: translateY(-50%); }
@@ -56,6 +57,8 @@
     .postcode-controls button { width: auto; min-width: 92px; min-height: 52px; margin: 0; padding: 0 16px; font-size: 14px; }
     .privacy-note { margin: 9px 3px 0; color: #91a2ad; font-size: 11px; line-height: 1.45; }
     .status { min-height: 20px; margin: 13px 2px 0; color: #bdc9d0; font-size: 13px; line-height: 1.45; text-align: center; }
+    .compass-button { min-height: 48px; margin-top: 15px; border: 1px solid #ffffff24; background: #ffffff12; color: #f6f3ed; font-size: 14px; }
+    .compass-status { min-height: 18px; margin: 8px 2px 0; color: #aebdc6; font-size: 12px; line-height: 1.45; text-align: center; }
     .footnote { margin: 20px 10px 0; color: #91a2ad; font-size: 12px; line-height: 1.5; text-align: center; }
   </style>
 </head>
@@ -66,9 +69,11 @@
     <p class="intro">Its compass direction for your location, right now.</p>
     <section class="card" aria-label="Sun direction">
       <div class="compass" aria-hidden="true">
-        <span class="label north">N</span><span class="label east">E</span>
-        <span class="label south">S</span><span class="label west">W</span>
-        <div class="needle" id="needle"></div>
+        <div class="compass-rose" id="compass-rose">
+          <span class="label north">N</span><span class="label east">E</span>
+          <span class="label south">S</span><span class="label west">W</span>
+          <div class="needle" id="needle"></div>
+        </div>
         <div class="center"><div class="degrees" id="degrees">—°</div><div class="direction" id="direction">Waiting for location</div></div>
       </div>
       <div class="details">
@@ -92,8 +97,10 @@
         <p class="privacy-note">The postcode you enter is sent to Postcodes.io to look up its coordinates. This app does not save it.</p>
       </form>
       <p class="status" id="status" role="status">Tap to estimate the Sun’s position. Your location stays on this device.</p>
+      <button class="compass-button" id="enable-compass" type="button">Enable phone compass</button>
+      <p class="compass-status" id="compass-status" role="status">Keep the iPhone flat. Allow Motion & Orientation Access if Safari asks.</p>
     </section>
-    <p class="footnote">An approximate solar calculation for everyday use. The compass shows direction from north; altitude is how high the Sun is above the horizon.</p>
+    <p class="footnote">When enabled, the compass rose turns with your phone so the pointer can indicate the Sun on screen. Keep the iPhone flat. Its magnetic compass can drift a few degrees.</p>
   </main>
   <script>
     // Solar position approximation based on the NOAA solar calculator equations.
@@ -129,9 +136,15 @@
     const postcodePanel = document.getElementById("postcode-panel");
     const postcodeInput = document.getElementById("postcode-input");
     const postcodeSubmit = document.getElementById("postcode-submit");
+    const compassButton = document.getElementById("enable-compass");
+    const compassStatus = document.getElementById("compass-status");
+    const compassRose = document.getElementById("compass-rose");
     let position = null;
     let locationSource = "device";
     let locationName = "";
+    let compassListening = false;
+    let lastHeading = null;
+    let compassRotation = 0;
 
     function chooseLocationMode(mode) {
       const useDevice = mode === "device";
@@ -149,6 +162,53 @@
 
     deviceMode.addEventListener("click", () => chooseLocationMode("device"));
     postcodeMode.addEventListener("click", () => chooseLocationMode("postcode"));
+
+    function handleOrientation(event) {
+      const heading = event.webkitCompassHeading;
+      if (typeof heading !== "number" || !Number.isFinite(heading) || heading < 0) {
+        compassStatus.textContent = "Waiting for a compass heading. Hold the iPhone flat and move it gently.";
+        return;
+      }
+      if (lastHeading === null) {
+        compassRotation = heading;
+      } else {
+        let change = heading - lastHeading;
+        if (change > 180) change -= 360;
+        if (change < -180) change += 360;
+        compassRotation += change;
+      }
+      lastHeading = heading;
+      compassRose.style.transform = `rotate(${-compassRotation}deg)`;
+      compassButton.textContent = "Phone compass enabled";
+      compassStatus.textContent = "Compass is on · heading is approximate and may drift a few degrees.";
+    }
+
+    compassButton.addEventListener("click", async () => {
+      if (!window.DeviceOrientationEvent) {
+        compassStatus.textContent = "This browser does not provide phone compass readings.";
+        return;
+      }
+      compassButton.disabled = true;
+      compassStatus.textContent = "Requesting compass access…";
+      try {
+        if (typeof DeviceOrientationEvent.requestPermission === "function") {
+          const permission = await DeviceOrientationEvent.requestPermission(true);
+          if (permission !== "granted") {
+            compassStatus.textContent = "Compass access was declined. You can allow it in Safari’s website settings.";
+            return;
+          }
+        }
+        if (!compassListening) {
+          window.addEventListener("deviceorientation", handleOrientation);
+          compassListening = true;
+        }
+        compassStatus.textContent = "Hold the iPhone flat and allow a moment for the compass to settle.";
+      } catch (error) {
+        compassStatus.textContent = "Could not start the compass. Try again in Safari and check Motion & Orientation Access.";
+      } finally {
+        compassButton.disabled = false;
+      }
+    });
 
     function updateDisplay() {
       const now = new Date();

@@ -29,7 +29,7 @@
     .compass::after { height: 1px; width: 84%; left: 8%; top: calc(50% - .5px); }
     .compass-rose { position: absolute; inset: 0; transition: transform .12s linear; }
     .label { position: absolute; z-index: 2; color: #b8c8d1; font-size: 11px; font-weight: 700; }
-    .north { top: 11px; left: 50%; transform: translateX(-50%); color: #f4bd70; }
+    .north { top: 8px; left: 50%; transform: translateX(-50%); color: #ffd083; font-size: 16px; font-weight: 850; text-shadow: 0 0 12px #ffc16b88; }
     .east { right: 13px; top: 50%; transform: translateY(-50%); }
     .south { bottom: 11px; left: 50%; transform: translateX(-50%); }
     .west { left: 13px; top: 50%; transform: translateY(-50%); }
@@ -37,7 +37,7 @@
     .needle::before { content: ""; position: absolute; width: 3px; height: 52%; left: calc(50% - 1.5px); top: 0; border-radius: 5px; background: linear-gradient(#ffd083, #f47f53); box-shadow: 0 0 15px #ffc16b88; }
     .needle::after { content: ""; position: absolute; width: 12px; height: 12px; border: 2px solid #fff4df; background: #26374a; border-radius: 50%; top: calc(50% - 6px); left: calc(50% - 6px); }
     .center { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; z-index: 3; pointer-events: none; }
-    .degrees { font-size: clamp(46px, 14vw, 62px); font-weight: 650; letter-spacing: -.06em; font-variant-numeric: tabular-nums; line-height: 1; }
+    .degrees { font-size: clamp(36px, 10vw, 46px); font-weight: 650; letter-spacing: -.06em; font-variant-numeric: tabular-nums; line-height: 1; }
     .direction { margin-top: 6px; color: #ffd083; font-size: 16px; font-weight: 700; }
     .details { display: flex; justify-content: space-between; gap: 12px; padding-top: 15px; border-top: 1px solid #ffffff18; color: #bdc9d0; font-size: 13px; }
     .details strong { display: block; margin-top: 5px; color: #f6f3ed; font-size: 14px; font-weight: 600; }
@@ -78,7 +78,7 @@
       </div>
       <div class="details">
         <div>LOCAL TIME<strong id="local-time">—</strong></div>
-        <div style="text-align:right">SUN ALTITUDE<strong id="altitude">—</strong></div>
+        <div style="text-align:right">SUN CENTRE ALTITUDE<strong id="altitude">—°</strong></div>
       </div>
       <p class="location-display" id="location-display">Location not set</p>
       <div class="location-options" role="group" aria-label="Choose how to set your location">
@@ -108,7 +108,9 @@
     function solarPosition(date, latitude, longitude) {
       const day = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 86400000);
       const minutes = date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
-      const gamma = 2 * Math.PI / 365 * (day - 1 + (minutes / 60 - 12) / 24);
+      const isLeapYear = new Date(date.getFullYear(), 1, 29).getMonth() === 1;
+      const daysInYear = isLeapYear ? 366 : 365;
+      const gamma = 2 * Math.PI / daysInYear * (day - 1 + (minutes / 60 - 12) / 24);
       const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
       const declination = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma) - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma) - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
       const zoneOffsetHours = -date.getTimezoneOffset() / 60;
@@ -216,7 +218,7 @@
       if (!position) {
         degrees.textContent = "—°";
         direction.textContent = "Waiting for location";
-        altitude.textContent = "—";
+        altitude.textContent = "—°";
         locationDisplay.textContent = "Location not set";
         document.getElementById("needle").style.setProperty("--bearing", "180deg");
         return;
@@ -225,7 +227,7 @@
       const rounded = Math.round(sun.azimuth);
       degrees.textContent = `${rounded}°`;
       direction.textContent = directions[Math.round(sun.azimuth / 22.5) % 16];
-      altitude.textContent = `${Math.round(sun.altitude)}°`;
+      altitude.textContent = `${sun.altitude.toFixed(1)}°`;
       document.getElementById("needle").style.setProperty("--bearing", `${sun.azimuth}deg`);
       locationDisplay.textContent = locationSource === "postcode" ? `Postcode reference: ${locationName}` : "Using this device’s location";
       status.textContent = sun.altitude <= 0 ? "The Sun is below the horizon at this location." : locationSource === "postcode" ? "Approximate direction · based on postcode coordinates" : "Approximate direction · refreshed every minute";

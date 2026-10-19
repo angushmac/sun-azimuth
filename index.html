@@ -27,20 +27,50 @@
     .compass::before, .compass::after { content: ""; position: absolute; background: #d8e8ef25; }
     .compass::before { width: 1px; height: 84%; top: 8%; left: calc(50% - .5px); }
     .compass::after { height: 1px; width: 84%; left: 8%; top: calc(50% - .5px); }
-    .compass-rose { position: absolute; inset: 0; transition: transform .12s linear; }
+    .compass-rose { position: absolute; inset: 0; isolation: isolate; transition: transform .12s linear; }
+    .day-cycle-overlay { position: absolute; z-index: 0; inset: 0; border-radius: 50%; background: transparent; pointer-events: none; }
     .label { position: absolute; z-index: 2; color: #b8c8d1; font-size: 11px; font-weight: 700; }
-    .north { top: 11px; left: 50%; transform: translateX(-50%); color: #f4bd70; }
+    .north { top: 8px; left: 50%; transform: translateX(-50%); color: #ffd083; font-size: 24px; font-weight: 900; text-shadow: 0 0 12px #ffc16b88; }
     .east { right: 13px; top: 50%; transform: translateY(-50%); }
     .south { bottom: 11px; left: 50%; transform: translateX(-50%); }
     .west { left: 13px; top: 50%; transform: translateY(-50%); }
     .needle { position: absolute; z-index: 1; inset: 22% 0 22%; transform: rotate(var(--bearing, 180deg)); transition: transform .5s ease; }
     .needle::before { content: ""; position: absolute; width: 3px; height: 52%; left: calc(50% - 1.5px); top: 0; border-radius: 5px; background: linear-gradient(#ffd083, #f47f53); box-shadow: 0 0 15px #ffc16b88; }
     .needle::after { content: ""; position: absolute; width: 12px; height: 12px; border: 2px solid #fff4df; background: #26374a; border-radius: 50%; top: calc(50% - 6px); left: calc(50% - 6px); }
-    .center { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; z-index: 3; pointer-events: none; }
-    .degrees { font-size: clamp(46px, 14vw, 62px); font-weight: 650; letter-spacing: -.06em; font-variant-numeric: tabular-nums; line-height: 1; }
+    .sun-tip { position: absolute; z-index: 1; inset: 22% 0; transform: rotate(var(--bearing, 180deg)); transition: transform .5s ease; pointer-events: none; }
+    .sun-tip::after { content: ""; position: absolute; width: 8px; height: 8px; left: calc(50% - 4px); top: -3px; border: 1px solid #fff4df; border-radius: 50%; background: #ffd083; box-shadow: 0 0 9px #ffc16baa; }
+    .moon-needle { position: absolute; z-index: 1; inset: 27% 0; transform: rotate(var(--moon-bearing, 180deg)); transition: transform .5s ease; }
+    .moon-needle::before { content: ""; position: absolute; width: 2px; height: 48%; left: calc(50% - 1px); top: 0; border-radius: 4px; background: #7de4f5; box-shadow: 0 0 10px #7de4f599; }
+    .moon-needle::after { content: ""; position: absolute; width: 8px; height: 8px; left: calc(50% - 4px); top: -3px; border: 1px solid #d9fbff; border-radius: 50%; background: #62d7ed; box-shadow: 0 0 9px #7de4f5aa; }
+    .center { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; z-index: 3; pointer-events: none; transform: translateY(-20px); }
+    .degrees { color: #ffd083; font-size: clamp(18px, 5vw, 23px); font-weight: 650; letter-spacing: -.06em; font-variant-numeric: tabular-nums; line-height: 1; }
     .direction { margin-top: 6px; color: #ffd083; font-size: 16px; font-weight: 700; }
     .details { display: flex; justify-content: space-between; gap: 12px; padding-top: 15px; border-top: 1px solid #ffffff18; color: #bdc9d0; font-size: 13px; }
     .details strong { display: block; margin-top: 5px; color: #f6f3ed; font-size: 14px; font-weight: 600; }
+    .pointer-legend { display: flex; justify-content: center; gap: 16px; margin: -3px 0 13px; color: #bdc9d0; font-size: 11px; }
+    .pointer-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .sun-legend { color: #ffd083; }
+    .moon-legend { color: #7de4f5; }
+    .pointer-swatch { width: 9px; height: 9px; border-radius: 50%; }
+    .sun-pointer-swatch { background: #ffd083; }
+    .moon-pointer-swatch { background: #7de4f5; }
+    .sun-altitude { color: #ffd083; }
+    .sun-altitude strong { color: #ffd083; }
+    .moon-info { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #ffffff18; color: #7de4f5; font-size: 12px; }
+    .moon-info strong { display: block; margin-top: 5px; color: #7de4f5; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .day-cycle { margin-top: 22px; padding-top: 18px; border-top: 1px solid #ffffff18; }
+    .day-cycle-title { color: #a6c1d1; font-size: 11px; font-weight: 750; letter-spacing: .12em; text-align: center; }
+    .day-cycle-overlay.polar-day { background: #efbd724d; }
+    .day-cycle-overlay.polar-night { background: #26374a80; }
+    .cycle-times { display: flex; justify-content: center; gap: 30px; color: #bdc9d0; font-size: 13px; text-align: center; }
+    .cycle-times strong { display: block; margin-top: 4px; color: #f6f3ed; font-size: 15px; font-variant-numeric: tabular-nums; }
+    .cycle-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 14px; margin-top: 15px; color: #bdc9d0; font-size: 11px; }
+    .cycle-legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .legend-daylight { background: #efbd72; }
+    .legend-twilight { background: #b87552; }
+    .legend-night { background: #26374a; border: 1px solid #8293a1; }
+    .twilight-note { margin: 9px 5px 0; color: #91a2ad; font-size: 11px; line-height: 1.45; text-align: center; }
     .location-display { margin: 15px 0 0; color: #d6e1e6; font-size: 13px; text-align: center; }
     .location-options { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 17px; padding: 4px; border: 1px solid #ffffff18; border-radius: 15px; background: #0002; }
     button { width: 100%; min-height: 54px; margin-top: 18px; border: 0; border-radius: 16px; background: #f5bd72; color: #172333; font: inherit; font-size: 16px; font-weight: 750; cursor: pointer; }
@@ -70,16 +100,40 @@
     <section class="card" aria-label="Sun direction">
       <div class="compass" aria-hidden="true">
         <div class="compass-rose" id="compass-rose">
+          <div class="day-cycle-overlay" id="day-cycle-overlay"></div>
           <span class="label north">N</span><span class="label east">E</span>
           <span class="label south">S</span><span class="label west">W</span>
           <div class="needle" id="needle"></div>
+          <div class="moon-needle" id="moon-needle"></div>
+          <div class="sun-tip" aria-hidden="true"></div>
         </div>
         <div class="center"><div class="degrees" id="degrees">—°</div><div class="direction" id="direction">Waiting for location</div></div>
       </div>
+      <div class="pointer-legend" aria-label="Compass pointers">
+        <span class="sun-legend"><i class="pointer-swatch sun-pointer-swatch"></i>Sun</span>
+        <span class="moon-legend"><i class="pointer-swatch moon-pointer-swatch"></i>Moon</span>
+      </div>
       <div class="details">
         <div>LOCAL TIME<strong id="local-time">—</strong></div>
-        <div style="text-align:right">SUN ALTITUDE<strong id="altitude">—</strong></div>
+        <div class="sun-altitude" style="text-align:right">SUN CENTRE ALTITUDE<strong id="altitude">—°</strong></div>
       </div>
+      <div class="moon-info" aria-label="Moon details">
+        <div>AGE SINCE NEW MOON<strong id="moon-age">— days</strong></div>
+        <div style="text-align:right">MOON ALTITUDE<strong id="moon-altitude">—°</strong></div>
+      </div>
+      <section class="day-cycle" aria-label="Daylight and night">
+        <div class="day-cycle-title">DAYLIGHT &amp; NIGHT</div>
+        <div class="cycle-times">
+          <div>SUNRISE<strong id="sunrise-time">—</strong></div>
+          <div>SUNSET<strong id="sunset-time">—</strong></div>
+        </div>
+        <div class="cycle-legend" aria-label="Chart colours">
+          <span><i class="legend-dot legend-daylight"></i>Day</span>
+          <span><i class="legend-dot legend-twilight"></i>30-minute twilight</span>
+          <span><i class="legend-dot legend-night"></i>Night</span>
+        </div>
+        <p class="twilight-note">The colours follow the Sun’s path. At geographic noon, the Sun pointer bisects the daylight arc. Twilight covers 30 minutes before sunrise and after sunset.</p>
+      </section>
       <p class="location-display" id="location-display">Location not set</p>
       <div class="location-options" role="group" aria-label="Choose how to set your location">
         <button class="mode-button active" id="device-mode" type="button" aria-pressed="true">Use my location</button>
@@ -100,17 +154,37 @@
       <button class="compass-button" id="enable-compass" type="button">Enable phone compass</button>
       <p class="compass-status" id="compass-status" role="status">Keep the iPhone flat. Allow Motion & Orientation Access if Safari asks.</p>
     </section>
-    <p class="footnote">When enabled, the compass rose turns with your phone so the pointer can indicate the Sun on screen. Keep the iPhone flat. Its magnetic compass can drift a few degrees.</p>
+    <p class="footnote">When enabled, the compass rose turns with your phone so the pointers can indicate the Sun and Moon on screen. Keep the iPhone flat. Its magnetic compass can drift a few degrees. Sun and Moon positions, refraction and rise/set times are approximate.</p>
   </main>
   <script>
     // Solar position approximation based on the NOAA solar calculator equations.
     // Angles are adequate for a simple direction finder, not navigation or surveying.
-    function solarPosition(date, latitude, longitude) {
+    function solarTerms(date, minutes) {
       const day = Math.floor((Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) - Date.UTC(date.getFullYear(), 0, 0)) / 86400000);
-      const minutes = date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
-      const gamma = 2 * Math.PI / 365 * (day - 1 + (minutes / 60 - 12) / 24);
+      const isLeapYear = new Date(date.getFullYear(), 1, 29).getMonth() === 1;
+      const daysInYear = isLeapYear ? 366 : 365;
+      const gamma = 2 * Math.PI / daysInYear * (day - 1 + (minutes / 60 - 12) / 24);
       const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
       const declination = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma) - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma) - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
+      return { eqTime, declination };
+    }
+
+    function atmosphericRefraction(altitude) {
+      if (altitude > 85) return 0;
+      if (altitude > 5) {
+        const tangent = Math.tan(altitude * Math.PI / 180);
+        return (58.1 / tangent - 0.07 / Math.pow(tangent, 3) + 0.000086 / Math.pow(tangent, 5)) / 3600;
+      }
+      if (altitude > -0.575) {
+        return (1735 + altitude * (-518.2 + altitude * (103.4 + altitude * (-12.79 + altitude * 0.711)))) / 3600;
+      }
+      const tangent = Math.tan(altitude * Math.PI / 180);
+      return tangent === 0 ? 0 : -20.772 / tangent / 3600;
+    }
+
+    function solarPosition(date, latitude, longitude) {
+      const minutes = date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
+      const { eqTime, declination } = solarTerms(date, minutes);
       const zoneOffsetHours = -date.getTimezoneOffset() / 60;
       const solarMinutes = ((minutes + eqTime + 4 * longitude - 60 * zoneOffsetHours) % 1440 + 1440) % 1440;
       const hourAngle = solarMinutes / 4 - 180;
@@ -119,14 +193,212 @@
       const cosineZenith = Math.sin(lat) * Math.sin(declination) + Math.cos(lat) * Math.cos(declination) * Math.cos(hour);
       const zenith = Math.acos(Math.max(-1, Math.min(1, cosineZenith)));
       const azimuth = (Math.atan2(Math.sin(hour), Math.cos(hour) * Math.sin(lat) - Math.tan(declination) * Math.cos(lat)) * 180 / Math.PI + 180 + 360) % 360;
-      return { azimuth, altitude: 90 - zenith * 180 / Math.PI };
+      const altitude = 90 - zenith * 180 / Math.PI;
+      return { azimuth, altitude, apparentAltitude: altitude + atmosphericRefraction(altitude) };
+    }
+
+    // Low-precision lunar orbit with the main perturbation terms; adequate for a visual compass pointer.
+    function lunarPosition(date, latitude, longitude) {
+      const radians = Math.PI / 180;
+      const days = (date.getTime() - Date.UTC(2000, 0, 0)) / 86400000;
+      const node = 125.1228 - 0.0529538083 * days;
+      const inclination = 5.1454;
+      const periapsis = 318.0634 + 0.1643573223 * days;
+      const eccentricity = 0.0549;
+      const meanAnomaly = 115.3654 + 13.0649929509 * days;
+      const eccentricAnomaly = meanAnomaly + eccentricity * 180 / Math.PI * Math.sin(meanAnomaly * radians) * (1 + eccentricity * Math.cos(meanAnomaly * radians));
+      const xOrbit = 60.2666 * (Math.cos(eccentricAnomaly * radians) - eccentricity);
+      const yOrbit = 60.2666 * Math.sqrt(1 - eccentricity * eccentricity) * Math.sin(eccentricAnomaly * radians);
+      const distance = Math.sqrt(xOrbit * xOrbit + yOrbit * yOrbit);
+      const trueAnomaly = Math.atan2(yOrbit, xOrbit) / radians;
+      const orbitalLongitude = trueAnomaly + periapsis;
+      const x = distance * (Math.cos(node * radians) * Math.cos(orbitalLongitude * radians) - Math.sin(node * radians) * Math.sin(orbitalLongitude * radians) * Math.cos(inclination * radians));
+      const y = distance * (Math.sin(node * radians) * Math.cos(orbitalLongitude * radians) + Math.cos(node * radians) * Math.sin(orbitalLongitude * radians) * Math.cos(inclination * radians));
+      const z = distance * Math.sin(orbitalLongitude * radians) * Math.sin(inclination * radians);
+
+      const sunMeanAnomaly = 356.0470 + 0.9856002585 * days;
+      const sunLongitude = 282.9404 + 4.70935e-5 * days + sunMeanAnomaly;
+      const moonMeanLongitude = node + periapsis + meanAnomaly;
+      const elongation = moonMeanLongitude - sunLongitude;
+      const argumentLatitude = moonMeanLongitude - node;
+      let eclipticLongitude = Math.atan2(y, x) / radians;
+      let eclipticLatitude = Math.atan2(z, Math.sqrt(x * x + y * y)) / radians;
+      eclipticLongitude += -1.274 * Math.sin((meanAnomaly - 2 * elongation) * radians)
+        + 0.658 * Math.sin(2 * elongation * radians)
+        - 0.186 * Math.sin(sunMeanAnomaly * radians)
+        - 0.059 * Math.sin((2 * meanAnomaly - 2 * elongation) * radians)
+        - 0.057 * Math.sin((meanAnomaly - 2 * elongation + sunMeanAnomaly) * radians)
+        + 0.053 * Math.sin((meanAnomaly + 2 * elongation) * radians)
+        + 0.046 * Math.sin((2 * elongation - sunMeanAnomaly) * radians)
+        + 0.041 * Math.sin((meanAnomaly - sunMeanAnomaly) * radians)
+        - 0.035 * Math.sin(elongation * radians)
+        - 0.031 * Math.sin((meanAnomaly + sunMeanAnomaly) * radians)
+        - 0.015 * Math.sin((2 * argumentLatitude - 2 * elongation) * radians)
+        + 0.011 * Math.sin((meanAnomaly - 4 * elongation) * radians);
+      eclipticLatitude += -0.173 * Math.sin((argumentLatitude - 2 * elongation) * radians)
+        - 0.055 * Math.sin((meanAnomaly - argumentLatitude - 2 * elongation) * radians)
+        - 0.046 * Math.sin((meanAnomaly + argumentLatitude - 2 * elongation) * radians)
+        + 0.033 * Math.sin((argumentLatitude + 2 * elongation) * radians)
+        + 0.017 * Math.sin((2 * meanAnomaly + argumentLatitude) * radians);
+
+      const obliquity = 23.4393 - 3.563e-7 * days;
+      const longitudeRadians = eclipticLongitude * radians;
+      const latitudeRadians = eclipticLatitude * radians;
+      const obliquityRadians = obliquity * radians;
+      const rightAscension = Math.atan2(
+        Math.sin(longitudeRadians) * Math.cos(obliquityRadians) - Math.tan(latitudeRadians) * Math.sin(obliquityRadians),
+        Math.cos(longitudeRadians)
+      );
+      const declination = Math.asin(
+        Math.sin(latitudeRadians) * Math.cos(obliquityRadians)
+          + Math.cos(latitudeRadians) * Math.sin(obliquityRadians) * Math.sin(longitudeRadians)
+      );
+
+      const julianDate = date.getTime() / 86400000 + 2440587.5;
+      const centuries = (julianDate - 2451545) / 36525;
+      const siderealTime = (280.46061837 + 360.98564736629 * (julianDate - 2451545) + 0.000387933 * centuries * centuries - centuries * centuries * centuries / 38710000 + longitude + 360) % 360;
+      const hourAngle = ((siderealTime * radians - rightAscension + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+
+      // Apply lunar horizontal parallax to estimate the observer's topocentric position.
+      const observerLatitude = latitude * radians;
+      const u = Math.atan(0.99664719 * Math.tan(observerLatitude));
+      const rhoSinLatitude = 0.99664719 * Math.sin(u);
+      const rhoCosLatitude = Math.cos(u);
+      const horizontalParallax = Math.asin(1 / distance);
+      const deltaRightAscension = Math.atan2(
+        -rhoCosLatitude * Math.sin(horizontalParallax) * Math.sin(hourAngle),
+        Math.cos(declination) - rhoCosLatitude * Math.sin(horizontalParallax) * Math.cos(hourAngle)
+      );
+      const topocentricHourAngle = hourAngle - deltaRightAscension;
+      const topocentricDeclination = Math.atan2(
+        (Math.sin(declination) - rhoSinLatitude * Math.sin(horizontalParallax)) * Math.cos(deltaRightAscension),
+        Math.cos(declination) - rhoCosLatitude * Math.sin(horizontalParallax) * Math.cos(hourAngle)
+      );
+      const altitude = Math.asin(
+        Math.sin(observerLatitude) * Math.sin(topocentricDeclination)
+          + Math.cos(observerLatitude) * Math.cos(topocentricDeclination) * Math.cos(topocentricHourAngle)
+      ) / radians;
+      const azimuth = (Math.atan2(
+        Math.sin(topocentricHourAngle),
+        Math.cos(topocentricHourAngle) * Math.sin(observerLatitude) - Math.tan(topocentricDeclination) * Math.cos(observerLatitude)
+      ) / radians + 180 + 360) % 360;
+      return { azimuth, altitude, apparentAltitude: altitude + atmosphericRefraction(altitude) };
+    }
+
+    function lunarAgeDays(date) {
+      const synodicMonth = 29.530588853;
+      const knownNewMoon = Date.UTC(2000, 0, 6, 18, 14);
+      const daysSinceEpoch = (date.getTime() - knownNewMoon) / 86400000;
+      return Math.floor(((daysSinceEpoch % synodicMonth) + synodicMonth) % synodicMonth);
+    }
+
+    function sunTimes(date, latitude, longitude) {
+      const { eqTime, declination } = solarTerms(date, 720);
+      const latitudeRadians = latitude * Math.PI / 180;
+      const zenithRadians = 90.833 * Math.PI / 180;
+      const cosineHourAngle = (Math.cos(zenithRadians) / (Math.cos(latitudeRadians) * Math.cos(declination))) - Math.tan(latitudeRadians) * Math.tan(declination);
+      if (cosineHourAngle > 1) return { polarNight: true };
+      if (cosineHourAngle < -1) return { polarDay: true };
+
+      const hourAngle = Math.acos(Math.max(-1, Math.min(1, cosineHourAngle))) * 180 / Math.PI;
+      const localNoon = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+      const zoneOffsetHours = -localNoon.getTimezoneOffset() / 60;
+      const solarNoonMinutes = 720 - eqTime - 4 * longitude + 60 * zoneOffsetHours;
+      return { sunriseMinutes: solarNoonMinutes - 4 * hourAngle, sunsetMinutes: solarNoonMinutes + 4 * hourAngle, solarNoonMinutes };
+    }
+
+    function dateAtLocalMinute(date, minutes) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, Math.round(minutes));
+    }
+
+    function formatClock(date, minutes) {
+      const time = dateAtLocalMinute(date, minutes);
+      return new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" }).format(time);
+    }
+
+    function normalizedAngle(angle) {
+      return (angle % 360 + 360) % 360;
+    }
+
+    function clockwiseDistance(start, end) {
+      return normalizedAngle(end - start);
+    }
+
+    function angularDistance(a, b) {
+      const distance = clockwiseDistance(a, b);
+      return Math.min(distance, 360 - distance);
+    }
+
+    function daylightCompassGradient(sunriseAzimuth, sunsetAzimuth, dawnAzimuth, duskAzimuth, noonAzimuth) {
+      const clockwiseDayLength = clockwiseDistance(sunriseAzimuth, sunsetAzimuth);
+      const clockwiseMidpoint = normalizedAngle(sunriseAzimuth + clockwiseDayLength / 2);
+      const counterclockwiseDayLength = 360 - clockwiseDayLength;
+      const counterclockwiseMidpoint = normalizedAngle(sunsetAzimuth + counterclockwiseDayLength / 2);
+      const sunMovesClockwise = angularDistance(clockwiseMidpoint, noonAzimuth) <= angularDistance(counterclockwiseMidpoint, noonAzimuth);
+
+      const dayLength = sunMovesClockwise ? clockwiseDayLength : counterclockwiseDayLength;
+      let dawnLength = sunMovesClockwise ? clockwiseDistance(dawnAzimuth, sunriseAzimuth) : clockwiseDistance(sunriseAzimuth, dawnAzimuth);
+      let duskLength = sunMovesClockwise ? clockwiseDistance(sunsetAzimuth, duskAzimuth) : clockwiseDistance(duskAzimuth, sunsetAzimuth);
+      const availableTwilightArc = Math.max(0, 360 - dayLength);
+      if (dawnLength + duskLength > availableTwilightArc && dawnLength + duskLength > 0) {
+        const scale = availableTwilightArc / (dawnLength + duskLength);
+        dawnLength *= scale;
+        duskLength *= scale;
+      }
+
+      const night = "rgba(20, 32, 47, 0.43)";
+      const twilight = "rgba(184, 117, 82, 0.48)";
+      const daylight = "rgba(239, 189, 114, 0.42)";
+      const segments = sunMovesClockwise
+        ? [
+            { start: normalizedAngle(sunriseAzimuth - dawnLength), length: dawnLength, color: twilight },
+            { start: sunriseAzimuth, length: dayLength, color: daylight },
+            { start: sunsetAzimuth, length: duskLength, color: twilight }
+          ]
+        : [
+            { start: normalizedAngle(duskAzimuth), length: duskLength, color: twilight },
+            { start: sunsetAzimuth, length: dayLength, color: daylight },
+            { start: sunriseAzimuth, length: dawnLength, color: twilight }
+          ];
+
+      const boundaries = [0, 360];
+      for (const segment of segments) {
+        if (segment.length <= 0) continue;
+        const start = normalizedAngle(segment.start);
+        const end = start + segment.length;
+        boundaries.push(start, Math.min(end, 360));
+        if (end > 360) boundaries.push(end - 360);
+      }
+      const stops = [...new Set(boundaries)].sort((a, b) => a - b);
+      const colorAt = (angle) => {
+        const segment = segments.find(({ start, length }) => length > 0 && clockwiseDistance(start, angle) < length);
+        return segment?.color ?? night;
+      };
+      const gradientStops = [];
+      let previousColor = colorAt((stops[0] + stops[1]) / 2);
+      gradientStops.push(`${previousColor} 0deg`);
+      for (let i = 1; i < stops.length - 1; i += 1) {
+        const boundary = stops[i];
+        const nextColor = colorAt((boundary + stops[i + 1]) / 2);
+        gradientStops.push(`${previousColor} ${boundary}deg`, `${nextColor} ${boundary}deg`);
+        previousColor = nextColor;
+      }
+      gradientStops.push(`${previousColor} 360deg`);
+      return `conic-gradient(${gradientStops.join(", ")})`;
     }
 
     const directions = ["north", "north-northeast", "northeast", "east-northeast", "east", "east-southeast", "southeast", "south-southeast", "south", "south-southwest", "southwest", "west-southwest", "west", "west-northwest", "northwest", "north-northwest"];
     const degrees = document.getElementById("degrees");
     const direction = document.getElementById("direction");
     const altitude = document.getElementById("altitude");
+    const moonAltitude = document.getElementById("moon-altitude");
+    const moonAge = document.getElementById("moon-age");
+    const moonNeedle = document.getElementById("moon-needle");
     const localTime = document.getElementById("local-time");
+    const sunriseTime = document.getElementById("sunrise-time");
+    const sunsetTime = document.getElementById("sunset-time");
+    const dayCycleOverlay = document.getElementById("day-cycle-overlay");
+    const sunTip = document.querySelector(".sun-tip");
     const locationDisplay = document.getElementById("location-display");
     const status = document.getElementById("status");
     const button = document.getElementById("locate");
@@ -145,6 +417,37 @@
     let compassListening = false;
     let lastHeading = null;
     let compassRotation = 0;
+
+    function updateDayCycle(now, latitude, longitude) {
+      dayCycleOverlay.classList.remove("polar-day", "polar-night");
+      if (latitude === null || longitude === null) {
+        sunriseTime.textContent = "—";
+        sunsetTime.textContent = "—";
+        dayCycleOverlay.style.background = "transparent";
+        return;
+      }
+
+      const times = sunTimes(now, latitude, longitude);
+      if (times.polarDay || times.polarNight) {
+        const isPolarDay = times.polarDay;
+        sunriseTime.textContent = "No sunrise";
+        sunsetTime.textContent = "No sunset";
+        dayCycleOverlay.classList.add(isPolarDay ? "polar-day" : "polar-night");
+        dayCycleOverlay.style.background = "";
+        return;
+      }
+
+      const { sunriseMinutes, sunsetMinutes, solarNoonMinutes } = times;
+      sunriseTime.textContent = formatClock(now, sunriseMinutes);
+      sunsetTime.textContent = formatClock(now, sunsetMinutes);
+      const azimuthAt = (minutes) => solarPosition(dateAtLocalMinute(now, minutes), latitude, longitude).azimuth;
+      const sunriseAzimuth = azimuthAt(sunriseMinutes);
+      const sunsetAzimuth = azimuthAt(sunsetMinutes);
+      const dawnAzimuth = azimuthAt(sunriseMinutes - 30);
+      const duskAzimuth = azimuthAt(sunsetMinutes + 30);
+      const noonAzimuth = azimuthAt(solarNoonMinutes);
+      dayCycleOverlay.style.background = daylightCompassGradient(sunriseAzimuth, sunsetAzimuth, dawnAzimuth, duskAzimuth, noonAzimuth);
+    }
 
     function chooseLocationMode(mode) {
       const useDevice = mode === "device";
@@ -216,17 +519,30 @@
       if (!position) {
         degrees.textContent = "—°";
         direction.textContent = "Waiting for location";
-        altitude.textContent = "—";
+        altitude.textContent = "—°";
+        moonAltitude.textContent = "—°";
+        moonAge.textContent = "— days";
         locationDisplay.textContent = "Location not set";
         document.getElementById("needle").style.setProperty("--bearing", "180deg");
+        sunTip.style.setProperty("--bearing", "180deg");
+        moonNeedle.style.setProperty("--moon-bearing", "180deg");
+        updateDayCycle(now, null, null);
         return;
       }
-      const sun = solarPosition(now, position.coords.latitude, position.coords.longitude);
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      const sun = solarPosition(now, latitude, longitude);
+      const moon = lunarPosition(now, latitude, longitude);
       const rounded = Math.round(sun.azimuth);
       degrees.textContent = `${rounded}°`;
       direction.textContent = directions[Math.round(sun.azimuth / 22.5) % 16];
-      altitude.textContent = `${Math.round(sun.altitude)}°`;
+      altitude.textContent = `${sun.apparentAltitude.toFixed(1)}°`;
+      moonAltitude.textContent = `${moon.apparentAltitude.toFixed(1)}°`;
+      moonAge.textContent = `${lunarAgeDays(now)} days`;
       document.getElementById("needle").style.setProperty("--bearing", `${sun.azimuth}deg`);
+      sunTip.style.setProperty("--bearing", `${sun.azimuth}deg`);
+      moonNeedle.style.setProperty("--moon-bearing", `${moon.azimuth}deg`);
+      updateDayCycle(now, latitude, longitude);
       locationDisplay.textContent = locationSource === "postcode" ? `Postcode reference: ${locationName}` : "Using this device’s location";
       status.textContent = sun.altitude <= 0 ? "The Sun is below the horizon at this location." : locationSource === "postcode" ? "Approximate direction · based on postcode coordinates" : "Approximate direction · refreshed every minute";
     }

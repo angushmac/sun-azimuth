@@ -1,6 +1,6 @@
 # Sun Azimuth
 
-A small installable web app that estimates the Sun's compass bearing and altitude for the current time and a chosen location.
+A small installable web app that estimates the Sun's compass bearing and the geometric altitude of its centre for the current time and a chosen location. The altitude is shown to one decimal place, and the calculation accounts for leap years. These are approximate sky-guide values, not corrected sextant observations.
 
 ## Choose a location
 

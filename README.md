@@ -1,6 +1,6 @@
 # Sun Azimuth
 
-A small installable web app that estimates the Sun's compass bearing and altitude for the current time and a chosen location.
+A small installable web app that estimates the Sun's compass bearing and the apparent altitude of its centre for the current time and a chosen location. The altitude is shown to one decimal place and includes a standard atmospheric-refraction estimate. The calculation accounts for leap years. These are approximate sky-guide values, not sextant observations.
 
 ## Choose a location
 
@@ -8,6 +8,8 @@ A small installable web app that estimates the Sun's compass bearing and altitud
 - **Use UK postcode** sends the postcode you enter to [Postcodes.io](https://postcodes.io/) to look up its coordinates. The app does not save the postcode. A postcode result is an approximate reference point for that area.
 
 Tap **Enable phone compass** and allow Motion & Orientation Access if Safari asks. Keep the iPhone flat: the compass rose then turns with the phone, moving north around the dial while the pointer indicates the Sun on screen. The phone's magnetic compass can drift a few degrees.
+
+The compass rose overlays the Sun's daylight arc, night, and a 30-minute twilight band before sunrise and after sunset. The Sun pointer follows the arc and bisects the daylight colour at geographic noon. Sunrise and sunset are estimates based on the conventional apparent horizon; local weather and atmospheric conditions can shift the observed times.
 
 ## What is in this folder?
 

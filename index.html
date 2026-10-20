@@ -11,10 +11,7 @@
   <link rel="icon" href="sun-icon.svg" type="image/svg+xml">
   <title>Sun Azimuth</title>
   <style>
-    :root {
-      color-scheme: dark;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    :root { color-scheme: dark; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     * { box-sizing: border-box; }
     body {
       min-height: 100svh;
@@ -26,449 +23,82 @@
       background: radial-gradient(ellipse at 50% 8%, #263c53 0%, #162538 35%, #101b2b 72%);
     }
     main { width: min(100%, 420px); }
-    .eyebrow {
-      color: #a6c1d1;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .16em;
-      text-transform: uppercase;
-    }
-    h1 {
-      margin: 8px 0 5px;
-      font-size: clamp(32px, 9vw, 43px);
-      letter-spacing: -.045em;
-    }
-    .intro {
-      margin: 0;
-      color: #c1ccd4;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-    .card {
-      margin-top: 26px;
-      padding: 24px;
-      border: 1px solid #ffffff1a;
-      border-radius: 26px;
-      background: #ffffff0b;
-      box-shadow: 0 20px 60px #0003;
-    }
-    .compass {
-      width: min(70vw, 250px);
-      aspect-ratio: 1;
-      position: relative;
-      margin: 2px auto 17px;
-      border: 1px solid #d8e8ef44;
-      border-radius: 50%;
-      background: radial-gradient(circle, #ffffff0b 0 58%, #ffffff06 59%);
-    }
-    .compass::before, .compass::after {
-      content: "";
-      position: absolute;
-      background: #d8e8ef25;
-    }
-    .compass::before {
-      width: 1px;
-      height: 84%;
-      top: 8%;
-      left: calc(50% - .5px);
-    }
-    .compass::after {
-      height: 1px;
-      width: 84%;
-      left: 8%;
-      top: calc(50% - .5px);
-    }
-    .compass-rose {
-      position: absolute;
-      inset: 0;
-      isolation: isolate;
-      transition: transform .12s linear;
-    }
-    .day-cycle-overlay {
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      border-radius: 50%;
-      background: transparent;
-      pointer-events: none;
-    }
-    .label {
-      position: absolute;
-      z-index: 2;
-      color: #b8c8d1;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .north {
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #ffd083;
-      font-size: 24px;
-      font-weight: 900;
-      text-shadow: 0 0 12px #ffc16b88;
-    }
+    .eyebrow { color: #a6c1d1; font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+    h1 { margin: 8px 0 5px; font-size: clamp(32px, 9vw, 43px); letter-spacing: -.045em; }
+    .intro { margin: 0; color: #c1ccd4; font-size: 15px; line-height: 1.5; }
+    .card { margin-top: 26px; padding: 24px; border: 1px solid #ffffff1a; border-radius: 26px; background: #ffffff0b; box-shadow: 0 20px 60px #0003; }
+    .compass { width: min(70vw, 250px); aspect-ratio: 1; position: relative; margin: 2px auto 17px; border: 1px solid #d8e8ef44; border-radius: 50%; background: radial-gradient(circle, #ffffff0b 0 58%, #ffffff06 59%); }
+    .compass::before, .compass::after { content: ""; position: absolute; background: #d8e8ef25; }
+    .compass::before { width: 1px; height: 84%; top: 8%; left: calc(50% - .5px); }
+    .compass::after { height: 1px; width: 84%; left: 8%; top: calc(50% - .5px); }
+    .compass-rose { position: absolute; inset: 0; isolation: isolate; transition: transform .12s linear; }
+    .day-cycle-overlay { position: absolute; z-index: 0; inset: 0; border-radius: 50%; background: transparent; pointer-events: none; }
+    .label { position: absolute; z-index: 2; color: #b8c8d1; font-size: 11px; font-weight: 700; }
+    .north { top: 8px; left: 50%; transform: translateX(-50%); color: #ffd083; font-size: 24px; font-weight: 900; text-shadow: 0 0 12px #ffc16b88; }
     .east { right: 13px; top: 50%; transform: translateY(-50%); }
     .south { bottom: 11px; left: 50%; transform: translateX(-50%); }
     .west { left: 13px; top: 50%; transform: translateY(-50%); }
-    .needle {
-      position: absolute;
-      z-index: 1;
-      inset: 22% 0;
-      transform: rotate(var(--bearing, 180deg));
-      transition: transform .5s ease;
-    }
-    .needle::before {
-      content: "";
-      position: absolute;
-      width: 3px;
-      height: 52%;
-      left: calc(50% - 1.5px);
-      top: 0;
-      border-radius: 5px;
-      background: linear-gradient(#ffd083, #f47f53);
-      box-shadow: 0 0 15px #ffc16b88;
-    }
-    .needle::after {
-      content: "";
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      border: 2px solid #fff4df;
-      background: #26374a;
-      border-radius: 50%;
-      top: calc(50% - 6px);
-      left: calc(50% - 6px);
-    }
-    .sun-tip {
-      position: absolute;
-      z-index: 1;
-      inset: 22% 0;
-      transform: rotate(var(--bearing, 180deg));
-      transition: transform .5s ease;
-      pointer-events: none;
-    }
-    .sun-tip::after {
-      content: "";
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      left: calc(50% - 4px);
-      top: -3px;
-      border: 1px solid #fff4df;
-      border-radius: 50%;
-      background: #ffd083;
-      box-shadow: 0 0 9px #ffc16baa;
-    }
-    .moon-needle {
-      position: absolute;
-      z-index: 1;
-      inset: 27% 0;
-      transform: rotate(var(--moon-bearing, 180deg));
-      transition: transform .5s ease;
-    }
-    .moon-needle::before {
-      content: "";
-      position: absolute;
-      width: 2px;
-      height: 48%;
-      left: calc(50% - 1px);
-      top: 0;
-      border-radius: 4px;
-      background: #7de4f5;
-      box-shadow: 0 0 10px #7de4f599;
-    }
-    .moon-needle::after {
-      content: "";
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      left: calc(50% - 4px);
-      top: -3px;
-      border: 1px solid #d9fbff;
-      border-radius: 50%;
-      background: #62d7ed;
-      box-shadow: 0 0 9px #7de4f5aa;
-    }
-    .sunset-marker {
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      pointer-events: none;
-      transform: rotate(var(--tick-bearing, 0deg));
-    }
-    .sunset-marker::before {
-      content: "";
-      position: absolute;
-      top: 14%;
-      left: calc(50% - 1px);
-      width: 2px;
-      height: 9px;
-      border-radius: 2px;
-      background: #fff0c7;
-      box-shadow: 0 0 4px #101b2b;
-    }
-    .sunset-marker span {
-      position: absolute;
-      top: 20%;
-      left: calc(50% - 12px);
-      width: 24px;
-      color: #fff0c7;
-      font-size: 10px;
-      font-weight: 750;
-      line-height: 14px;
-      text-align: center;
-      text-shadow: 0 1px 3px #101b2b, 0 0 4px #101b2b;
-      transform: rotate(var(--tick-counter-bearing, 0deg));
-    }
-    .center {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      align-content: center;
-      justify-items: center;
-      z-index: 3;
-      pointer-events: none;
-      transform: translateY(-20px);
-    }
-    .degrees {
-      color: #ffd083;
-      font-size: clamp(18px, 5vw, 23px);
-      font-weight: 650;
-      letter-spacing: -.06em;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-    }
-    .direction {
-      margin-top: 6px;
-      color: #ffd083;
-      font-size: 16px;
-      font-weight: 700;
-    }
-    .details {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding-top: 15px;
-      border-top: 1px solid #ffffff18;
-      color: #bdc9d0;
-      font-size: 13px;
-    }
-    .details strong {
-      display: block;
-      margin-top: 5px;
-      color: #f6f3ed;
-      font-size: 14px;
-      font-weight: 600;
-    }
-    .pointer-legend {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin: -3px 0 13px;
-      color: #bdc9d0;
-      font-size: 11px;
-    }
-    .pointer-legend span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .needle { position: absolute; z-index: 1; inset: 22% 0; transform: rotate(var(--bearing, 180deg)); transition: transform .5s ease; }
+    .needle::before { content: ""; position: absolute; width: 3px; height: 52%; left: calc(50% - 1.5px); top: 0; border-radius: 5px; background: linear-gradient(#ffd083, #f47f53); box-shadow: 0 0 15px #ffc16b88; }
+    .needle::after { content: ""; position: absolute; width: 12px; height: 12px; border: 2px solid #fff4df; background: #26374a; border-radius: 50%; top: calc(50% - 6px); left: calc(50% - 6px); }
+    .sun-tip { position: absolute; z-index: 1; inset: 22% 0; transform: rotate(var(--bearing, 180deg)); transition: transform .5s ease; pointer-events: none; }
+    .sun-tip::after { content: ""; position: absolute; width: 8px; height: 8px; left: calc(50% - 4px); top: -3px; border: 1px solid #fff4df; border-radius: 50%; background: #ffd083; box-shadow: 0 0 9px #ffc16baa; }
+    .moon-needle { position: absolute; z-index: 1; inset: 27% 0; transform: rotate(var(--moon-bearing, 180deg)); transition: transform .5s ease; }
+    .moon-needle::before { content: ""; position: absolute; width: 2px; height: 48%; left: calc(50% - 1px); top: 0; border-radius: 4px; background: #7de4f5; box-shadow: 0 0 10px #7de4f599; }
+    .moon-needle::after { content: ""; position: absolute; width: 8px; height: 8px; left: calc(50% - 4px); top: -3px; border: 1px solid #d9fbff; border-radius: 50%; background: #62d7ed; box-shadow: 0 0 9px #7de4f5aa; }
+    .sunset-marker { position: absolute; inset: 0; z-index: 2; pointer-events: none; transform: rotate(var(--tick-bearing, 0deg)); }
+    .sunset-marker::before { content: ""; position: absolute; top: 14%; left: calc(50% - 1px); width: 2px; height: 9px; border-radius: 2px; background: #fff0c7; box-shadow: 0 0 4px #101b2b; }
+    .sunset-marker span { position: absolute; top: 20%; left: calc(50% - 12px); width: 24px; color: #fff0c7; font-size: 10px; font-weight: 750; line-height: 14px; text-align: center; text-shadow: 0 1px 3px #101b2b, 0 0 4px #101b2b; transform: rotate(var(--tick-counter-bearing, 0deg)); }
+    .center { position: absolute; inset: 0; display: grid; align-content: center; justify-items: center; z-index: 3; pointer-events: none; transform: translateY(-20px); }
+    .degrees { color: #ffd083; font-size: clamp(18px, 5vw, 23px); font-weight: 650; letter-spacing: -.06em; font-variant-numeric: tabular-nums; line-height: 1; }
+    .direction { margin-top: 6px; color: #ffd083; font-size: 16px; font-weight: 700; }
+    .details { display: flex; justify-content: space-between; gap: 12px; padding-top: 15px; border-top: 1px solid #ffffff18; color: #bdc9d0; font-size: 13px; }
+    .details strong { display: block; margin-top: 5px; color: #f6f3ed; font-size: 14px; font-weight: 600; }
+    .pointer-legend { display: flex; justify-content: center; gap: 16px; margin: -3px 0 13px; color: #bdc9d0; font-size: 11px; }
+    .pointer-legend span { display: inline-flex; align-items: center; gap: 6px; }
     .sun-legend { color: #ffd083; }
     .moon-legend { color: #7de4f5; }
     .pointer-swatch { width: 9px; height: 9px; border-radius: 50%; }
     .sun-pointer-swatch { background: #ffd083; }
     .moon-pointer-swatch { background: #7de4f5; }
     .sun-altitude, .sun-altitude strong { color: #ffd083; }
-    .moon-info {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #ffffff18;
-      color: #7de4f5;
-      font-size: 12px;
-    }
-    .moon-info strong {
-      display: block;
-      margin-top: 5px;
-      color: #7de4f5;
-      font-size: 14px;
-      font-weight: 600;
-      font-variant-numeric: tabular-nums;
-    }
-    .day-cycle {
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 1px solid #ffffff18;
-    }
-    .day-cycle-title {
-      color: #a6c1d1;
-      font-size: 11px;
-      font-weight: 750;
-      letter-spacing: .12em;
-      text-align: center;
-    }
+    .moon-info { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #ffffff18; color: #7de4f5; font-size: 12px; }
+    .moon-info strong { display: block; margin-top: 5px; color: #7de4f5; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .day-cycle { margin-top: 22px; padding-top: 18px; border-top: 1px solid #ffffff18; }
+    .day-cycle-title { color: #a6c1d1; font-size: 11px; font-weight: 750; letter-spacing: .12em; text-align: center; }
     .day-cycle-overlay.polar-day { background: #efbd724d; }
     .day-cycle-overlay.polar-night { background: #26374a80; }
-    .cycle-times {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 8px;
-      color: #bdc9d0;
-      font-size: 11px;
-      text-align: center;
-    }
-    .cycle-times strong {
-      display: block;
-      margin-top: 4px;
-      color: #f6f3ed;
-      font-size: 15px;
-      font-variant-numeric: tabular-nums;
-    }
+    .cycle-times { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; color: #bdc9d0; font-size: 11px; text-align: center; }
+    .cycle-times strong { display: block; margin-top: 4px; color: #f6f3ed; font-size: 15px; font-variant-numeric: tabular-nums; }
     .cycle-times .remaining, .cycle-times .remaining strong { color: #ffd083; }
-    .cycle-legend {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px 14px;
-      margin-top: 15px;
-      color: #bdc9d0;
-      font-size: 11px;
-    }
-    .cycle-legend span {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
+    .cycle-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 14px; margin-top: 15px; color: #bdc9d0; font-size: 11px; }
+    .cycle-legend span { display: inline-flex; align-items: center; gap: 5px; }
     .legend-dot { width: 9px; height: 9px; border-radius: 50%; }
     .legend-daylight { background: #efbd72; }
     .legend-twilight { background: #b87552; }
     .legend-night { background: #26374a; border: 1px solid #8293a1; }
-    .twilight-note {
-      margin: 9px 5px 0;
-      color: #91a2ad;
-      font-size: 11px;
-      line-height: 1.45;
-      text-align: center;
-    }
-    .location-display {
-      margin: 15px 0 0;
-      color: #d6e1e6;
-      font-size: 13px;
-      text-align: center;
-    }
-    button {
-      width: 100%;
-      min-height: 54px;
-      margin-top: 18px;
-      border: 0;
-      border-radius: 16px;
-      background: #f5bd72;
-      color: #172333;
-      font: inherit;
-      font-size: 16px;
-      font-weight: 750;
-      cursor: pointer;
-    }
+    .twilight-note { margin: 9px 5px 0; color: #91a2ad; font-size: 11px; line-height: 1.45; text-align: center; }
+    .location-display { margin: 15px 0 0; color: #d6e1e6; font-size: 13px; text-align: center; }
+    button { width: 100%; min-height: 54px; margin-top: 18px; border: 0; border-radius: 16px; background: #f5bd72; color: #172333; font: inherit; font-size: 16px; font-weight: 750; cursor: pointer; }
     button:active { transform: scale(.99); }
     button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-
-    /* Three buttons on one row. */
-    .action-row {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 4px;
-      margin-top: 17px;
-      padding: 4px;
-      border: 1px solid #ffffff18;
-      border-radius: 15px;
-      background: #0002;
-    }
-    .action-row button {
-      min-width: 0;
-      min-height: 44px;
-      margin: 0;
-      padding: 6px 2px;
-      border-radius: 10px;
-      font-size: clamp(11px, 3vw, 13px);
-      line-height: 1.2;
-      white-space: nowrap;
-    }
+    .action-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; margin-top: 17px; padding: 4px; border: 1px solid #ffffff18; border-radius: 15px; background: #0002; }
+    .action-row button { min-width: 0; min-height: 44px; margin: 0; padding: 6px 2px; border-radius: 10px; font-size: clamp(11px, 3vw, 13px); line-height: 1.2; white-space: nowrap; }
     .mode-button { background: transparent; color: #bdc9d0; }
     .mode-button.active { background: #ffffff1b; color: #fff; }
-    .action-row .compass-button {
-      border: 1px solid #ffffff24;
-      background: #ffffff12;
-      color: #f6f3ed;
-    }
+    .action-row .compass-button { border: 1px solid #ffffff24; background: #ffffff12; color: #f6f3ed; }
     .action-row button:disabled { opacity: .65; cursor: wait; }
     .postcode-panel { margin-top: 15px; }
-    .postcode-panel label {
-      display: block;
-      margin-bottom: 7px;
-      color: #d6e1e6;
-      font-size: 13px;
-      font-weight: 650;
-    }
-    .postcode-controls {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 9px;
-    }
-    .postcode-controls input {
-      min-width: 0;
-      min-height: 52px;
-      padding: 0 14px;
-      border: 1px solid #ffffff38;
-      border-radius: 14px;
-      background: #0d1826;
-      color: #fff;
-      font: inherit;
-      font-size: 16px;
-      text-transform: uppercase;
-    }
+    .postcode-panel label { display: block; margin-bottom: 7px; color: #d6e1e6; font-size: 13px; font-weight: 650; }
+    .postcode-controls { display: grid; grid-template-columns: 1fr auto; gap: 9px; }
+    .postcode-controls input { min-width: 0; min-height: 52px; padding: 0 14px; border: 1px solid #ffffff38; border-radius: 14px; background: #0d1826; color: #fff; font: inherit; font-size: 16px; text-transform: uppercase; }
     .postcode-controls input::placeholder { color: #8395a1; text-transform: none; }
     .postcode-controls input:focus-visible { outline: 3px solid #f5bd72; outline-offset: 2px; }
-    .postcode-controls button {
-      width: auto;
-      min-width: 92px;
-      min-height: 52px;
-      margin: 0;
-      padding: 0 16px;
-      font-size: 14px;
-    }
-    .privacy-note {
-      margin: 9px 3px 0;
-      color: #91a2ad;
-      font-size: 11px;
-      line-height: 1.45;
-    }
-    .status {
-      min-height: 20px;
-      margin: 13px 2px 0;
-      color: #bdc9d0;
-      font-size: 13px;
-      line-height: 1.45;
-      text-align: center;
-    }
-    .compass-status {
-      min-height: 18px;
-      margin: 8px 2px 0;
-      color: #aebdc6;
-      font-size: 12px;
-      line-height: 1.45;
-      text-align: center;
-    }
-    .footnote {
-      margin: 20px 10px 0;
-      color: #91a2ad;
-      font-size: 12px;
-      line-height: 1.5;
-      text-align: center;
-    }
+    .postcode-controls button { width: auto; min-width: 92px; min-height: 52px; margin: 0; padding: 0 16px; font-size: 14px; }
+    .privacy-note { margin: 9px 3px 0; color: #91a2ad; font-size: 11px; line-height: 1.45; }
+    .status { min-height: 20px; margin: 13px 2px 0; color: #bdc9d0; font-size: 13px; line-height: 1.45; text-align: center; }
+    .compass-status { min-height: 18px; margin: 8px 2px 0; color: #aebdc6; font-size: 12px; line-height: 1.45; text-align: center; }
+    .footnote { margin: 20px 10px 0; color: #91a2ad; font-size: 12px; line-height: 1.5; text-align: center; }
   </style>
 </head>
 <body>
@@ -565,15 +195,16 @@
         Your device location stays on this device.
       </p>
       <p class="compass-status" id="compass-status" role="status">
-        Keep the iPhone flat. Allow Motion &amp; Orientation Access if Safari asks.
+        Keep your phone flat. Tap Compass and allow sensor access if asked.
       </p>
     </section>
 
     <p class="footnote">
       When enabled, the compass rose turns with your phone so the pointers can
-      indicate the Sun and Moon on screen. Keep the iPhone flat.
-      Its magnetic compass can drift a few degrees. Sun and Moon positions,
-      daylight remaining, refraction and rise/set times are approximate.
+      indicate the Sun and Moon on screen. Keep your phone flat.
+      Compass support depends on your phone and browser. Magnetic readings can
+      differ from true north and drift. Sun and Moon positions, daylight remaining,
+      refraction and rise/set times are approximate.
     </p>
   </main>
 
@@ -581,8 +212,7 @@
     (() => {
       "use strict";
 
-      // Solar position approximation based on the NOAA solar calculator equations.
-      // Adequate for a simple direction finder, not navigation or surveying.
+      // Approximate solar position, based on NOAA solar calculator equations.
       function solarTerms(date, minutes) {
         const day = Math.floor(
           (Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
@@ -987,10 +617,12 @@
       let position = null;
       let locationSource = "device";
       let locationName = "";
+      let locationRequest = 0;
       let compassListening = false;
       let lastHeading = null;
       let compassRotation = 0;
-      let locationRequest = 0;
+      let compassWaitTimer = null;
+      let compassSource = "";
 
       function setPostcodePanel(open) {
         postcodePanel.hidden = !open;
@@ -1130,8 +762,7 @@
         setPostcodePanel(open);
         if (open) {
           postcodeInput.focus();
-          statusEl.textContent =
-            "Enter a UK postcode, then tap Look up.";
+          statusEl.textContent = "Enter a UK postcode, then tap Look up.";
         } else {
           updateDisplay();
         }
@@ -1230,17 +861,61 @@
         }
       });
 
-      function handleOrientation(event) {
-        const heading = event.webkitCompassHeading;
-
+      // Screen rotation relative to the phone's natural orientation.
+      function screenAngle() {
         if (
-          typeof heading !== "number"
-          || !Number.isFinite(heading)
-          || heading < 0
+          window.screen.orientation
+          && Number.isFinite(window.screen.orientation.angle)
         ) {
-          compassStatus.textContent =
-            "Waiting for a compass heading. Hold the iPhone flat and move it gently.";
+          return window.screen.orientation.angle;
+        }
+        return typeof window.orientation === "number"
+          ? window.orientation : 0;
+      }
+
+      function handleOrientation(event) {
+        let heading;
+        let source;
+
+        // Safari on iPhone supplies a clockwise compass heading.
+        if (
+          typeof event.webkitCompassHeading === "number"
+          && Number.isFinite(event.webkitCompassHeading)
+          && event.webkitCompassHeading >= 0
+        ) {
+          heading = event.webkitCompassHeading;
+          source = "apple";
+        } else if (
+          (
+            event.absolute === true
+            || event.type === "deviceorientationabsolute"
+          )
+          && typeof event.alpha === "number"
+          && Number.isFinite(event.alpha)
+        ) {
+          // Android can supply Earth-referenced, anticlockwise alpha.
+          // With the phone flat, convert it to a clockwise heading.
+          heading = 360 - event.alpha;
+          source = event.type === "deviceorientationabsolute"
+            ? "absolute-event" : "absolute";
+        } else {
+          // Relative orientation does not identify north.
           return;
+        }
+
+        // Prefer Apple's heading, or the dedicated absolute event,
+        // rather than alternating between two different sensor streams.
+        if (compassSource === "apple" && source !== "apple") return;
+        if (
+          compassSource === "absolute-event"
+          && source === "absolute"
+        ) return;
+
+        heading = normalizedAngle(heading + screenAngle());
+
+        if (source !== compassSource) {
+          compassSource = source;
+          lastHeading = null;
         }
 
         if (lastHeading === null) {
@@ -1253,14 +928,21 @@
         }
 
         lastHeading = heading;
+        window.clearTimeout(compassWaitTimer);
         compassRose.style.transform = `rotate(${-compassRotation}deg)`;
         compassButton.textContent = "On";
         compassButton.setAttribute("aria-label", "Phone compass enabled");
         compassStatus.textContent =
-          "Compass is on · heading is approximate and may drift a few degrees.";
+          "Compass is on · keep your phone flat. Heading is approximate and may drift.";
       }
 
       compassButton.addEventListener("click", async () => {
+        if (!window.isSecureContext) {
+          compassStatus.textContent =
+            "Open the app through its HTTPS website address to use the phone compass.";
+          return;
+        }
+
         if (!window.DeviceOrientationEvent) {
           compassStatus.textContent =
             "This browser does not provide phone compass readings.";
@@ -1279,21 +961,34 @@
 
             if (permission !== "granted") {
               compassStatus.textContent =
-                "Compass access was declined. You can allow it in Safari’s website settings.";
+                "Compass access was declined. Check sensor permissions in your browser’s website settings.";
               return;
             }
           }
 
           if (!compassListening) {
-            window.addEventListener("deviceorientation", handleOrientation);
+            window.addEventListener(
+              "deviceorientation", handleOrientation
+            );
+            window.addEventListener(
+              "deviceorientationabsolute", handleOrientation
+            );
             compassListening = true;
           }
 
           compassStatus.textContent =
-            "Hold the iPhone flat and allow a moment for the compass to settle.";
+            "Keep your phone flat and move it gently while waiting for a compass reading.";
+
+          window.clearTimeout(compassWaitTimer);
+          compassWaitTimer = window.setTimeout(() => {
+            compassButton.textContent = "Compass";
+            compassButton.setAttribute("aria-label", "Retry phone compass");
+            compassStatus.textContent =
+              "No compass heading received. Check sensor permissions, or try Safari on iPhone or Chrome on Android. Your phone may not provide a compass.";
+          }, 8000);
         } catch (error) {
           compassStatus.textContent =
-            "Could not start the compass. Try again in Safari and check Motion & Orientation Access.";
+            "Could not start the compass. Check sensor permissions in your browser’s website settings and try again.";
         } finally {
           compassButton.disabled = false;
         }
